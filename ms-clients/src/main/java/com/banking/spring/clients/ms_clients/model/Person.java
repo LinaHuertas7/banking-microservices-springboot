@@ -8,11 +8,13 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @MappedSuperclass
 @Getter
 @Setter
-public abstract class Person {
+@SuperBuilder
+public abstract class Person extends Auditable {
 
     @Column(nullable = false)
     private String name;

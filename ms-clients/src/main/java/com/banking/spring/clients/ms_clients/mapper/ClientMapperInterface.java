@@ -22,5 +22,8 @@ public interface ClientMapperInterface {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     @Mapping(target = "clientId", ignore = true)
     @Mapping(target = "identification", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
     void updateEntityFromDto(ClientUpdateDTO dto, @MappingTarget Client client);
 }

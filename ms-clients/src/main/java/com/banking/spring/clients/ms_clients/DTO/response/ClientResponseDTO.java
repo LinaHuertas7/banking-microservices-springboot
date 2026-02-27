@@ -3,14 +3,16 @@ package com.banking.spring.clients.ms_clients.DTO.response;
 import com.banking.spring.clients.ms_clients.enums.Gender;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
 @Setter
-@Builder
+@SuperBuilder
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientResponseDTO {

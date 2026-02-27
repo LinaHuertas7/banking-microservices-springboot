@@ -9,7 +9,9 @@ import com.banking.spring.clients.ms_clients.mapper.ClientMapperInterface;
 import com.banking.spring.clients.ms_clients.model.Client;
 import com.banking.spring.clients.ms_clients.repository.ClientRepositoryInterface;
 import com.banking.spring.clients.ms_clients.service.ClientServiceInterface;
+import com.banking.spring.clients.ms_clients.service.PasswordServiceInterface;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class ClientServiceImpl implements ClientServiceInterface {
 
     private final ClientRepositoryInterface clientRepository;
     private final ClientMapperInterface clientMapper;
+    private final PasswordServiceInterface passwordService;
 
     @Override
     @Transactional
@@ -34,6 +37,7 @@ public class ClientServiceImpl implements ClientServiceInterface {
         }
 
         Client client = clientMapper.toEntity(request);
+        client.setPassword(passwordService.encode(request.getPassword()));
         Client saved = clientRepository.save(client);
 
         log.info("El cliente fue creado exitosamente con id: {}", saved.getClientId());
@@ -50,7 +54,7 @@ public class ClientServiceImpl implements ClientServiceInterface {
     @Override
     @Transactional(readOnly = true)
     public List<ClientResponseDTO> findAll() {
-        List<ClientResponseDTO> clients = clientRepository.findAll()
+        List<ClientResponseDTO> clients = clientRepository.findAllActive()
                 .stream()
                 .map(clientMapper::toResponse)
                 .toList();
@@ -68,6 +72,10 @@ public class ClientServiceImpl implements ClientServiceInterface {
         Client client = findClientById(id);
         clientMapper.updateEntityFromDto(request, client);
 
+        if (hasNewPassword(request)) {
+            client.setPassword(passwordService.encode(request.getPassword()));
+        }
+
         return clientMapper.toResponse(clientRepository.save(client));
     }
 
@@ -75,6 +83,8 @@ public class ClientServiceImpl implements ClientServiceInterface {
     @Transactional
     public void delete(Long id) {
         Client client = findClientById(id);
+        client.setDeletedAt(LocalDateTime.now());
+
         client.setStatus(false);
         clientRepository.save(client);
 
@@ -82,8 +92,12 @@ public class ClientServiceImpl implements ClientServiceInterface {
     }
 
     private Client findClientById(Long id) {
-        return clientRepository.findById(id)
+        return clientRepository.findActiveById(id)
                 .orElseThrow(() -> new ClientNotFoundException("Cliente con el id %d no encontrado".formatted(id)));
+    }
+
+    private boolean hasNewPassword(ClientUpdateDTO request) {
+        return request.getPassword() != null && !request.getPassword().isBlank();
     }
 
 }
