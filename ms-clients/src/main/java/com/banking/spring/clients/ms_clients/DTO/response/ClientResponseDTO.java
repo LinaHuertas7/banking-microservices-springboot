@@ -4,13 +4,9 @@ import com.banking.spring.clients.ms_clients.enums.Gender;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-@Getter
-@Setter
 @SuperBuilder
 @Data
 @NoArgsConstructor

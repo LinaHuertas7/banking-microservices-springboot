@@ -3,11 +3,7 @@ package com.banking.spring.clients.ms_clients.DTO.request;
 import com.banking.spring.clients.ms_clients.enums.Gender;
 
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-@Getter
-@Setter
 @Data
 public class ClientUpdateDTO {
     private String name;
