@@ -10,6 +10,8 @@ RUN mvn clean package -DskipTests -B
 
 FROM eclipse-temurin:21-jre-alpine
 
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
