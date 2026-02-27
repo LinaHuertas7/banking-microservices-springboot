@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -42,6 +43,12 @@ public class ClientController {
     @GetMapping
     public ResponseEntity<List<ClientResponseDTO>> findAll() {
         return ResponseEntity.ok(clientService.findAll());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ClientResponseDTO> replace(@PathVariable Long id,
+            @Valid @RequestBody ClientRequestDTO request) {
+        return ResponseEntity.ok(clientService.replace(id, request));
     }
 
     @PatchMapping("/{id}")

@@ -66,6 +66,23 @@ public class ClientServiceImpl implements ClientServiceInterface {
 
     @Override
     @Transactional
+    public ClientResponseDTO replace(Long id, ClientRequestDTO request) {
+        Client client = findClientById(id);
+
+        if (!client.getIdentification().equals(request.getIdentification()) &&
+                clientRepository.existsByIdentification(request.getIdentification())) {
+            throw new ClientAlreadyExistsException(
+                    "La identificación %s ya está en uso".formatted(request.getIdentification()));
+        }
+
+        clientMapper.replaceEntityFromDto(request, client);
+        client.setPassword(passwordService.encode(request.getPassword()));
+
+        return clientMapper.toResponse(clientRepository.save(client));
+    }
+
+    @Override
+    @Transactional
     public ClientResponseDTO update(Long id, ClientUpdateDTO request) {
         log.info("Actualizando cliente con id: {}", id);
 

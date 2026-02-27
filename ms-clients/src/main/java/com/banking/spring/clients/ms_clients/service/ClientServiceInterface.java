@@ -13,6 +13,8 @@ public interface ClientServiceInterface {
 
     List<ClientResponseDTO> findAll();
 
+    ClientResponseDTO replace(Long id, ClientRequestDTO request);
+
     ClientResponseDTO update(Long id, ClientUpdateDTO request);
 
     void delete(Long id);

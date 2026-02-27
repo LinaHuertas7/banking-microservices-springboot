@@ -29,4 +29,9 @@ public interface ClientMapperInterface {
     @Mapping(target = "password", ignore = true)
 
     void updateEntityFromDto(ClientUpdateDTO dto, @MappingTarget Client client);
+
+    @IgnoreAuditFields
+    @Mapping(target = "clientId", ignore = true)
+    @Mapping(target = "password", ignore = true)
+    void replaceEntityFromDto(ClientRequestDTO dto, @MappingTarget Client client);
 }
