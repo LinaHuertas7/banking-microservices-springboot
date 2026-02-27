@@ -88,12 +88,13 @@ public class ClientServiceImpl implements ClientServiceInterface {
         client.setStatus(false);
         clientRepository.save(client);
 
-        log.info("Cliente con id {} desactivado y evento publicado", id);
+        log.info("Cliente con id {} desactivado", id);
     }
 
     private Client findClientById(Long id) {
         return clientRepository.findActiveById(id)
-                .orElseThrow(() -> new ClientNotFoundException("Cliente con el id %d no encontrado".formatted(id)));
+                .orElseThrow(
+                        () -> new ClientNotFoundException("No se encontro el cliente con el id %d".formatted(id)));
     }
 
     private boolean hasNewPassword(ClientUpdateDTO request) {

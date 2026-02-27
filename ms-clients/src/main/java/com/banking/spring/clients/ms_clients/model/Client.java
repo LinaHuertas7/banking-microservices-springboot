@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -14,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "clients")
 @Getter
 @Setter
+@NoArgsConstructor
 @SuperBuilder
 public class Client extends Person {
     @Id

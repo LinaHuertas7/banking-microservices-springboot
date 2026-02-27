@@ -11,6 +11,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -19,6 +20,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @Data
 @SuperBuilder
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public abstract class Auditable {
     @CreatedDate

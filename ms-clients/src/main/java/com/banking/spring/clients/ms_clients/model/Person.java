@@ -7,6 +7,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.MappedSuperclass;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
@@ -14,6 +15,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @SuperBuilder
+@NoArgsConstructor
 public abstract class Person extends Auditable {
 
     @Column(nullable = false)

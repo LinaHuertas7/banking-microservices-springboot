@@ -6,9 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,15 +44,15 @@ public class ClientController {
         return ResponseEntity.ok(clientService.findAll());
     }
 
-    @PutMapping("/{id}")
+    @PatchMapping("/{id}")
     public ResponseEntity<ClientResponseDTO> update(@PathVariable Long id,
             @Valid @RequestBody ClientUpdateDTO request) {
         return ResponseEntity.ok(clientService.update(id, request));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable Long id) {
+    public ResponseEntity<String> delete(@PathVariable Long id) {
         clientService.delete(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok("Cliente eliminado exitosamente");
     }
 }
