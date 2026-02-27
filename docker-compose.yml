@@ -1,0 +1,149 @@
+services:
+  db-clients:
+    image: mysql:8.0
+    container_name: db-clients
+    environment:
+      MYSQL_DATABASE: clients_db
+      MYSQL_ALLOW_EMPTY_PASSWORD: 1
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./../DB8:/var/lib/mysql
+      - ./ms-clients/src/main/resources/BaseDatos.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  db-accounts:
+    image: postgres:15-alpine
+    container_name: db-accounts
+    environment:
+      POSTGRES_DB: accounts_db
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_HOST_AUTH_METHOD: trust
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./../DB_POSTGRES:/var/lib/postgresql/data
+      - ./ms-accounts/src/main/resources/BaseDatos.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d accounts_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - banking-network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  ms-accounts:
+    build:
+      context: ./ms-accounts
+      dockerfile: Dockerfile
+    container_name: ms-accounts
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db-accounts:5432/accounts_db
+      SPRING_DATASOURCE_USERNAME: ${ACCOUNT_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${ACCOUNT_DB_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: org.postgresql.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.PostgreSQLDialect
+      SPRING_RABBITMQ_HOST: ${RABBITMQ_HOST}
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SERVER_PORT: 8081
+      MS_clients_URL: http://ms-clients:8082
+    networks:
+      - banking-network
+    depends_on:
+      db-accounts:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      ms-clients:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+
+  ms-clients:
+    build:
+      context: ./ms-clients
+      dockerfile: Dockerfile
+    container_name: ms-clients
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db-clients:3306/clients_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ${CLIENT_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${CLIENT_DB_PASSWORD}
+      SPRING_DATASOURCE_DRIVER_CLASS_NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
+      SPRING_RABBITMQ_HOST: ${RABBITMQ_HOST}
+      SPRING_RABBITMQ_PORT: ${RABBITMQ_PORT}
+      SPRING_RABBITMQ_USERNAME: ${RABBITMQ_USER}
+      SPRING_RABBITMQ_PASSWORD: ${RABBITMQ_PASS}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      SERVER_PORT: 8082
+    networks:
+      - banking-network
+    depends_on:
+      db-clients:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8082/actuator/health"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - banking-network
+    depends_on:
+      ms-clients:
+        condition: service_healthy
+      ms-accounts:
+        condition: service_healthy
+    restart: on-failure
+
+volumes:
+  clients_data:
+  accounts_data:
+  rabbitmq_data:
+
+networks:
+  banking-network:
+    driver: bridge
