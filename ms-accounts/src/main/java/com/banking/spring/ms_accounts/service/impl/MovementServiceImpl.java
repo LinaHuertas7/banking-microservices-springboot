@@ -11,6 +11,7 @@ import com.banking.spring.ms_accounts.mapper.MovementMapperInterface;
 import com.banking.spring.ms_accounts.model.Account;
 import com.banking.spring.ms_accounts.model.Movement;
 import com.banking.spring.ms_accounts.repository.MovementRepositoryInterface;
+import com.banking.spring.ms_accounts.service.AccountServiceInterface;
 import com.banking.spring.ms_accounts.service.MovementServiceInterface;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class MovementServiceImpl implements MovementServiceInterface {
     private final MovementRepositoryInterface movementRepository;
     private final MovementMapperInterface movementMapper;
-    private final AccountServiceImpl accountService;
+    private final AccountServiceInterface accountService;
 
     @Override
     @Transactional

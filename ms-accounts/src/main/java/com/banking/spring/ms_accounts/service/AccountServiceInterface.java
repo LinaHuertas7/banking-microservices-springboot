@@ -5,6 +5,7 @@ import java.util.List;
 import com.banking.spring.ms_accounts.DTO.request.AccountRequestDTO;
 import com.banking.spring.ms_accounts.DTO.request.AccountUpdateDTO;
 import com.banking.spring.ms_accounts.DTO.response.AccountResponseDTO;
+import com.banking.spring.ms_accounts.model.Account;
 
 public interface AccountServiceInterface {
     AccountResponseDTO create(AccountRequestDTO request);
@@ -16,6 +17,8 @@ public interface AccountServiceInterface {
     AccountResponseDTO replace(String slug, AccountRequestDTO request);
 
     AccountResponseDTO update(String slug, AccountUpdateDTO request);
+
+    Account findActiveAccountBySlug(String slug);
 
     void delete(String slug);
 }
