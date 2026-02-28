@@ -17,6 +17,9 @@ public interface ClientRepositoryInterface extends JpaRepository<Client, Long> {
     @Query("SELECT c FROM Client c WHERE c.slug = :slug AND c.deletedAt IS NULL")
     Optional<Client> findActiveBySlug(@Param("slug") String slug);
 
+    @Query("SELECT c FROM Client c WHERE c.clientId = :id AND c.deletedAt IS NULL")
+    Optional<Client> findActiveById(@Param("id") Long id);
+
     @Query("SELECT COUNT(c) > 0 FROM Client c WHERE c.identification = :identification AND c.deletedAt IS NULL")
     boolean existsActiveByIdentification(@Param("identification") String identification);
 

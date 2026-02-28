@@ -24,9 +24,9 @@ public class ClientQueryListener {
 
     @RabbitListener(queues = "client.query.request.queue")
     public ClientQueryResponseDTO handleValidationRequest(ClientQueryRequestDTO request) {
-        Optional<Client> client = clientRepository.findById(request.getClientId());
+        Optional<Client> client = clientRepository.findActiveById(request.getClientId());
 
-        log.info("Received validation request for clientId: {}, exists: {}, active: {}",
+        log.info("Se recibió una solicitud de validación para clientId: {}, existe: {}, activo: {}",
                 request.getClientId(),
                 client.isPresent(),
                 client.isPresent() && client.get().getStatus());
@@ -35,7 +35,7 @@ public class ClientQueryListener {
                 .map(c -> clientQueryMapper.toResponse(c, request))
                 .orElseGet(() -> clientQueryMapper.toNotFoundResponse(request));
 
-        log.info("Sending validation response for clientId: {}", response);
+        log.info("Enviando respuesta de validación para clientId: {}", response);
 
         return response;
     }
