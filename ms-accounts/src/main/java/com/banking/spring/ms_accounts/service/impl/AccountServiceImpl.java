@@ -15,6 +15,8 @@ import com.banking.spring.ms_accounts.model.Account;
 import com.banking.spring.ms_accounts.repository.AccountRepositoryInterface;
 import com.banking.spring.ms_accounts.repository.MovementRepositoryInterface;
 import com.banking.spring.ms_accounts.service.AccountServiceInterface;
+import com.banking.spring.ms_accounts.service.ClienteQueryServiceInterface;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
@@ -29,10 +31,13 @@ public class AccountServiceImpl implements AccountServiceInterface {
     private final AccountMapperInterface accountMapper;
 
     private final MovementRepositoryInterface movementRepository;
+    private final ClienteQueryServiceInterface clienteQueryService;
 
     @Override
     @Transactional
     public AccountResponseDTO create(AccountRequestDTO request) {
+        clienteQueryService.validateClient(request.getClientId());
+
         if (accountRepository.existsByAccountNumberAndDeletedAtIsNull(request.getAccountNumber())) {
             throw new AccountAlreadyExistsException(
                     "Ya existe una cuenta con el número %s".formatted(request.getAccountNumber()));

@@ -20,6 +20,24 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
+    @ExceptionHandler(ClientNotExistExeption.class)
+    public ResponseEntity<ErrorResponse> handleCLientNotExist(ClientNotExistExeption ex) {
+        log.warn("Cliente no encontrado: {}", ex.getMessage());
+        return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(ClientServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleClientServiceUnavailable(ClientServiceUnavailableException ex) {
+        log.error("Servicio de clientes no disponible: {}", ex.getMessage());
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+    }
+
+    @ExceptionHandler(ClientInactiveException.class)
+    public ResponseEntity<ErrorResponse> handleClientInactive(ClientInactiveException ex) {
+        log.warn("Cliente inactivo: {}", ex.getMessage());
+        return buildResponse(HttpStatus.UNPROCESSABLE_CONTENT, ex.getMessage());
+    }
+
     @ExceptionHandler(MovementNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleMovementNotFound(MovementNotFoundException ex) {
         log.warn("Movimiento no encontrado: {}", ex.getMessage());
