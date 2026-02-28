@@ -12,15 +12,16 @@ import com.banking.spring.ms_accounts.DTO.response.AccountResponseDTO;
 import com.banking.spring.ms_accounts.mapper.annotation.IgnoreAuditFields;
 import com.banking.spring.ms_accounts.model.Account;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { MovementMapperInterface.class })
 public interface AccountMapperInterface {
-
     @IgnoreAuditFields
     @Mapping(target = "accountId", ignore = true)
     @Mapping(target = "slug", ignore = true)
     @Mapping(target = "availableBalance", source = "initialBalance")
+    @Mapping(target = "movements", ignore = true)
     Account toEntity(AccountRequestDTO dto);
 
+    @Mapping(target = "movements", source = "movements")
     AccountResponseDTO toResponse(Account client);
 
     @IgnoreAuditFields
@@ -30,11 +31,13 @@ public interface AccountMapperInterface {
     @Mapping(target = "accountNumber", ignore = true)
     @Mapping(target = "availableBalance", ignore = true)
     @Mapping(target = "clientId", ignore = true)
+    @Mapping(target = "movements", ignore = true)
     void updateEntityFromDto(AccountUpdateDTO dto, @MappingTarget Account account);
 
     @IgnoreAuditFields
     @Mapping(target = "accountId", ignore = true)
     @Mapping(target = "slug", ignore = true)
     @Mapping(target = "availableBalance", ignore = true)
+    @Mapping(target = "movements", ignore = true)
     void replaceEntityFromDto(AccountRequestDTO dto, @MappingTarget Account account);
 }

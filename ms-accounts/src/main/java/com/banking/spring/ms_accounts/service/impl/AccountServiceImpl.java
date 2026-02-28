@@ -1,5 +1,6 @@
 package com.banking.spring.ms_accounts.service.impl;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -12,6 +13,7 @@ import com.banking.spring.ms_accounts.exception.AccountNotFoundException;
 import com.banking.spring.ms_accounts.mapper.AccountMapperInterface;
 import com.banking.spring.ms_accounts.model.Account;
 import com.banking.spring.ms_accounts.repository.AccountRepositoryInterface;
+import com.banking.spring.ms_accounts.repository.MovementRepositoryInterface;
 import com.banking.spring.ms_accounts.service.AccountServiceInterface;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +27,8 @@ public class AccountServiceImpl implements AccountServiceInterface {
 
     private final AccountRepositoryInterface accountRepository;
     private final AccountMapperInterface accountMapper;
+
+    private final MovementRepositoryInterface movementRepository;
 
     @Override
     @Transactional
@@ -43,7 +47,10 @@ public class AccountServiceImpl implements AccountServiceInterface {
     @Override
     @Transactional(readOnly = true)
     public AccountResponseDTO findBySlug(String slug) {
-        return accountMapper.toResponse(findActiveAccountBySlug(slug));
+        Account account = accountRepository.findActiveBySlugWithMovements(slug)
+                .orElseThrow(() -> new AccountNotFoundException(
+                        "No se encontró la cuenta con slug %s".formatted(slug)));
+        return accountMapper.toResponse(account);
     }
 
     @Override
@@ -91,10 +98,13 @@ public class AccountServiceImpl implements AccountServiceInterface {
     @Transactional
     public void delete(String slug) {
         Account account = findActiveAccountBySlug(slug);
+
+        movementRepository.softDeleteByAccountId(account.getAccountId(), LocalDateTime.now());
+
         account.anonymize();
         accountRepository.save(account);
 
-        log.info("Cuenta con slug {} desactivada", slug);
+        log.info("Cuenta {} eliminada junto con todos sus movimientos", account.getAccountNumber());
     }
 
     public Account findActiveAccountBySlug(String slug) {

@@ -8,7 +8,7 @@ import com.banking.spring.ms_accounts.model.Movement;
 
 @Mapper(componentModel = "spring")
 public interface MovementMapperInterface {
-    @Mapping(target = "accountId", source = "account.accountId")
     @Mapping(target = "accountNumber", source = "account.accountNumber")
+    @Mapping(target = "accountSlug", source = "account.slug")
     MovementResponseDTO toResponse(Movement movement);
 }

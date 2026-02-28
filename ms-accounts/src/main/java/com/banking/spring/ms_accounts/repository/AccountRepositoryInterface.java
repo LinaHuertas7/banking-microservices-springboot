@@ -16,6 +16,9 @@ public interface AccountRepositoryInterface extends JpaRepository<Account, Long>
     @Query("SELECT a FROM Account a WHERE a.slug = :slug AND a.deletedAt IS NULL")
     Optional<Account> findActiveBySlug(@Param("slug") String slug);
 
+    @Query("SELECT a FROM Account a LEFT JOIN FETCH a.movements m WHERE a.slug = :slug AND a.deletedAt IS NULL")
+    Optional<Account> findActiveBySlugWithMovements(@Param("slug") String slug);
+
     @Query("SELECT a FROM Account a WHERE a.accountNumber = :number AND a.deletedAt IS NULL")
     Optional<Account> findActiveByAccountNumber(@Param("number") String accountNumber);
 

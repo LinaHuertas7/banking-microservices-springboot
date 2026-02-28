@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import com.banking.spring.ms_accounts.enums.MovementType;
+import com.banking.spring.ms_accounts.utils.SlugGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -34,6 +36,9 @@ public class Movement extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long movementId;
 
+    @Column(nullable = false, unique = true, updatable = false)
+    private String slug;
+
     @Column(nullable = false)
     private LocalDateTime date;
 
@@ -50,4 +55,29 @@ public class Movement extends Auditable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id", nullable = false)
     private Account account;
+
+    @PrePersist
+    protected void onCreating() {
+        if (this.getSlug() == null || this.getSlug().isBlank()) {
+            this.setSlug(SlugGenerator.generate());
+        }
+    }
+
+    public void anonymize() {
+        this.setDeletedAt(LocalDateTime.now());
+    }
+
+    public static Movement register(
+            BigDecimal amount,
+            BigDecimal newBalance,
+            MovementType type,
+            Account account) {
+        return Movement.builder()
+                .date(LocalDateTime.now())
+                .movementType(type)
+                .amount(amount)
+                .balance(newBalance)
+                .account(account)
+                .build();
+    }
 }

@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/accounts")
+@RequestMapping("/cuentas")
 @RequiredArgsConstructor
 public class AccountController {
     private final AccountServiceInterface accountService;

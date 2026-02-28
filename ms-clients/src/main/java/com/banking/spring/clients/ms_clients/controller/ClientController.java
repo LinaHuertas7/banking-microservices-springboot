@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/clientes")
 @RequiredArgsConstructor
 public class ClientController {
     private final ClientServiceInterface clientService;
