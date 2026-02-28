@@ -19,5 +19,8 @@ public interface AccountRepositoryInterface extends JpaRepository<Account, Long>
     @Query("SELECT a FROM Account a WHERE a.accountNumber = :number AND a.deletedAt IS NULL")
     Optional<Account> findActiveByAccountNumber(@Param("number") String accountNumber);
 
-    boolean existsByAccountNumber(String accountNumber);
+    boolean existsByAccountNumberAndDeletedAtIsNull(String accountNumber);
+
+    boolean existsByAccountNumberAndDeletedAtIsNullAndSlugNot(String accountNumber, String slug);
+
 }

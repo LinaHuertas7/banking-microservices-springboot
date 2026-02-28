@@ -29,7 +29,7 @@ public class AccountServiceImpl implements AccountServiceInterface {
     @Override
     @Transactional
     public AccountResponseDTO create(AccountRequestDTO request) {
-        if (accountRepository.existsByAccountNumber(request.getAccountNumber())) {
+        if (accountRepository.existsByAccountNumberAndDeletedAtIsNull(request.getAccountNumber())) {
             throw new AccountAlreadyExistsException(
                     "Ya existe una cuenta con el número %s".formatted(request.getAccountNumber()));
         }
@@ -64,7 +64,10 @@ public class AccountServiceImpl implements AccountServiceInterface {
     public AccountResponseDTO replace(String slug, AccountRequestDTO request) {
         Account account = findActiveAccountBySlug(slug);
 
-        if (accountRepository.existsByAccountNumber(request.getAccountNumber())) {
+        boolean accountNumberTaken = accountRepository
+                .existsByAccountNumberAndDeletedAtIsNullAndSlugNot(request.getAccountNumber(), slug);
+
+        if (accountNumberTaken) {
             throw new AccountAlreadyExistsException(
                     "El número de cuenta %s ya está en uso".formatted(request.getAccountNumber()));
         }

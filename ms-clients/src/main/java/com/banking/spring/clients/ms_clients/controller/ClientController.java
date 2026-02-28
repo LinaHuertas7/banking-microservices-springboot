@@ -60,6 +60,6 @@ public class ClientController {
     @DeleteMapping("/{slug}")
     public ResponseEntity<String> delete(@PathVariable String slug) {
         clientService.delete(slug);
-        return ResponseEntity.ok("Cliente eliminado exitosamente");
+        return ResponseEntity.noContent().build();
     }
 }

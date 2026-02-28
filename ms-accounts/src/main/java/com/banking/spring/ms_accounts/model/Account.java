@@ -33,7 +33,7 @@ public class Account extends Auditable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true, updatable = false)
     private String slug;
 
     @Column(nullable = false, unique = true)

@@ -62,6 +62,6 @@ public class AccountController {
     @DeleteMapping("/{slug}")
     public ResponseEntity<String> delete(@PathVariable String slug) {
         accountService.delete(slug);
-        return ResponseEntity.ok("Cuenta eliminada exitosamente");
+        return ResponseEntity.noContent().build();
     }
 }
