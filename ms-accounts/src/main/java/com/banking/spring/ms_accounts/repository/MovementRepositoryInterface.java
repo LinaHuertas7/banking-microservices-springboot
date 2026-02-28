@@ -19,7 +19,7 @@ public interface MovementRepositoryInterface extends JpaRepository<Movement, Lon
         @Query("SELECT m FROM Movement m  WHERE m.slug=:slug AND m.deletedAt IS NULL AND m.account.deletedAt IS NULL")
         Optional<Movement> findActiveBySlug(@Param("slug") String slug);
 
-        @Query("SELECT m FROM Movement m JOIN m.account a WHERE a.clientId = :clientId AND m.date BETWEEN :start AND :end AND m.deletedAt IS NULL AND a.deletedAt IS NULL ORDER BY m.date DESC")
+        @Query(" SELECT m FROM Movement m JOIN FETCH m.account a WHERE a.clientId = :clientId AND m.date BETWEEN :start AND :end AND m.deletedAt IS NULL AND a.deletedAt IS NULL ORDER BY m.date DESC")
         List<Movement> findByClientIdAndDateRange(
                         @Param("clientId") Long clientId,
                         @Param("start") LocalDateTime from,
