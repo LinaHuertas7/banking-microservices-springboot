@@ -1,8 +1,10 @@
 package com.banking.spring.ms_accounts.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.banking.spring.ms_accounts.enums.AccountType;
+import com.banking.spring.ms_accounts.utils.SlugGenerator;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -11,6 +13,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +34,9 @@ public class Account extends Auditable {
     private Long accountId;
 
     @Column(nullable = false, unique = true)
+    private String slug;
+
+    @Column(nullable = false, unique = true)
     private String accountNumber;
 
     @Enumerated(EnumType.STRING)
@@ -48,4 +54,17 @@ public class Account extends Auditable {
 
     @Column(nullable = false)
     private Long clientId;
+
+    @PrePersist
+    protected void onCreating() {
+        if (this.getSlug() == null || this.getSlug().isBlank()) {
+            this.setSlug(SlugGenerator.generate());
+        }
+    }
+
+    public void anonymize() {
+        this.setDeletedAt(LocalDateTime.now());
+        this.setStatus(false);
+        this.setAccountNumber(this.getAccountNumber() + "_DELETED");
+    }
 }

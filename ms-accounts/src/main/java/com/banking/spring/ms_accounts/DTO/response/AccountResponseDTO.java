@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AccountResponseDTO {
-    private Long accountId;
+    private String slug;
     private String accountNumber;
     private AccountType accountType;
     private BigDecimal initialBalance;
