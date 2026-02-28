@@ -63,6 +63,9 @@ services:
       context: ./ms-accounts
       dockerfile: Dockerfile
     container_name: ms-accounts
+    volumes:
+      - ./ms-accounts:/app
+      - ~/.m2:/root/.m2
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db-accounts:5432/accounts_db
       SPRING_DATASOURCE_USERNAME: ${ACCOUNT_DB_USERNAME}
@@ -100,6 +103,9 @@ services:
       context: ./ms-clients
       dockerfile: Dockerfile
     container_name: ms-clients
+    volumes:
+      - ./ms-clients:/app
+      - ~/.m2:/root/.m2
     environment:
       SPRING_DATASOURCE_URL: jdbc:mysql://db-clients:3306/clients_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${CLIENT_DB_USERNAME}

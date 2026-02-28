@@ -1,24 +1,7 @@
-FROM maven:3.9.6-eclipse-temurin-21 AS builder
+FROM maven:3.9.6-eclipse-temurin-21
 
 WORKDIR /app
-
-COPY pom.xml .
-RUN mvn dependency:go-offline -B
-
-COPY src ./src
-RUN mvn clean package -DskipTests -B
-
-FROM eclipse-temurin:21-jre-alpine
-
-RUN apk add --no-cache curl
-
-WORKDIR /app
-
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-USER appuser
-
-COPY --from=builder /app/target/*.jar app.jar
 
 EXPOSE 8081
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["mvn", "compile", "spring-boot:run", "-Dspring-boot.run.fork=false"]
