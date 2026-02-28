@@ -1,5 +1,6 @@
 package com.banking.spring.clients.ms_clients.service.impl;
 
+import com.banking.spring.clients.ms_clients.DTO.event.ClientCreatedEventDTO;
 import com.banking.spring.clients.ms_clients.DTO.request.ClientRequestDTO;
 import com.banking.spring.clients.ms_clients.DTO.request.ClientUpdateDTO;
 import com.banking.spring.clients.ms_clients.DTO.response.ClientResponseDTO;
@@ -7,6 +8,7 @@ import com.banking.spring.clients.ms_clients.exception.ClientAlreadyExistsExcept
 import com.banking.spring.clients.ms_clients.exception.ClientNotFoundException;
 import com.banking.spring.clients.ms_clients.mapper.ClientMapperInterface;
 import com.banking.spring.clients.ms_clients.model.Client;
+import com.banking.spring.clients.ms_clients.publisher.ClientEventPublisher;
 import com.banking.spring.clients.ms_clients.repository.ClientRepositoryInterface;
 import com.banking.spring.clients.ms_clients.service.ClientServiceInterface;
 import com.banking.spring.clients.ms_clients.service.PasswordServiceInterface;
@@ -26,6 +28,7 @@ public class ClientServiceImpl implements ClientServiceInterface {
     private final ClientRepositoryInterface clientRepository;
     private final ClientMapperInterface clientMapper;
     private final PasswordServiceInterface passwordService;
+    private final ClientEventPublisher clientEventPublisher;
 
     @Override
     @Transactional
@@ -38,6 +41,9 @@ public class ClientServiceImpl implements ClientServiceInterface {
         Client client = clientMapper.toEntity(request);
         client.setPassword(passwordService.encode(request.getPassword()));
         Client saved = clientRepository.save(client);
+
+        clientEventPublisher.publishClientCreated(
+                new ClientCreatedEventDTO(saved.getClientId(), saved.getName(), saved.getIdentification()));
 
         log.info("El cliente fue creado exitosamente con slug: {}", saved.getSlug());
 
@@ -106,9 +112,8 @@ public class ClientServiceImpl implements ClientServiceInterface {
     }
 
     private Client findClientBySlug(String slug) {
-        return clientRepository.findActiveBySlug(slug)
-                .orElseThrow(
-                        () -> new ClientNotFoundException("No se encontro el cliente con el slug %s".formatted(slug)));
+        return clientRepository.findActiveBySlug(slug).orElseThrow(
+                () -> new ClientNotFoundException("No se encontro el cliente con el slug %s".formatted(slug)));
     }
 
     private boolean hasNewPassword(ClientUpdateDTO request) {

@@ -38,8 +38,8 @@ public class Client extends Person {
 
     @PrePersist
     protected void onCreating() {
-        if (this.slug == null || this.slug.isBlank()) {
-            this.slug = SlugGenerator.generate();
+        if (this.getSlug() == null || this.getSlug().isBlank()) {
+            this.setSlug(SlugGenerator.generate());
         }
     }
 
