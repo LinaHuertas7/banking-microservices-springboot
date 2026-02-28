@@ -35,9 +35,9 @@ public class ClientController {
         return ResponseEntity.status(HttpStatus.CREATED).body(clientService.create(request));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(clientService.findById(id));
+    @GetMapping("/{slug}")
+    public ResponseEntity<ClientResponseDTO> findBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(clientService.findBySlug(slug));
     }
 
     @GetMapping
@@ -45,21 +45,21 @@ public class ClientController {
         return ResponseEntity.ok(clientService.findAll());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> replace(@PathVariable Long id,
+    @PutMapping("/{slug}")
+    public ResponseEntity<ClientResponseDTO> replace(@PathVariable String slug,
             @Valid @RequestBody ClientRequestDTO request) {
-        return ResponseEntity.ok(clientService.replace(id, request));
+        return ResponseEntity.ok(clientService.replace(slug, request));
     }
 
-    @PatchMapping("/{id}")
-    public ResponseEntity<ClientResponseDTO> update(@PathVariable Long id,
+    @PatchMapping("/{slug}")
+    public ResponseEntity<ClientResponseDTO> update(@PathVariable String slug,
             @Valid @RequestBody ClientUpdateDTO request) {
-        return ResponseEntity.ok(clientService.update(id, request));
+        return ResponseEntity.ok(clientService.update(slug, request));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> delete(@PathVariable Long id) {
-        clientService.delete(id);
+    @DeleteMapping("/{slug}")
+    public ResponseEntity<String> delete(@PathVariable String slug) {
+        clientService.delete(slug);
         return ResponseEntity.ok("Cliente eliminado exitosamente");
     }
 }

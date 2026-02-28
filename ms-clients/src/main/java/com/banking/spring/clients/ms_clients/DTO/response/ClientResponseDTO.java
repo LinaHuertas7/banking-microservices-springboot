@@ -12,7 +12,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientResponseDTO {
-    private Long clientId;
+    private String slug;
     private String name;
     private Gender gender;
     private Integer age;

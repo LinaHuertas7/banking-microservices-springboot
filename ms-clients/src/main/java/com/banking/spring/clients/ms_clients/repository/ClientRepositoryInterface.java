@@ -14,12 +14,13 @@ public interface ClientRepositoryInterface extends JpaRepository<Client, Long> {
     @Query("SELECT c FROM Client c WHERE c.deletedAt IS NULL")
     List<Client> findAllActive();
 
-    @Query("SELECT c FROM Client c WHERE c.clientId = :id AND c.deletedAt IS NULL")
-    Optional<Client> findActiveById(@Param("id") Long id);
+    @Query("SELECT c FROM Client c WHERE c.slug = :slug AND c.deletedAt IS NULL")
+    Optional<Client> findActiveBySlug(@Param("slug") String slug);
 
-    boolean existsByIdentification(String identification);
+    @Query("SELECT COUNT(c) > 0 FROM Client c WHERE c.identification = :identification AND c.deletedAt IS NULL")
+    boolean existsActiveByIdentification(@Param("identification") String identification);
 
     @Modifying
-    @Query("UPDATE Client c SET c.deletedAt = NULL, c.status = true WHERE c.clientId = :id")
-    void restore(@Param("id") Long id);
+    @Query("UPDATE Client c SET c.deletedAt = NULL, c.status = true WHERE c.slug = :slug")
+    void restore(@Param("slug") String slug);
 }

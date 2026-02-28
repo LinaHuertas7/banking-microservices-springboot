@@ -9,13 +9,13 @@ import com.banking.spring.clients.ms_clients.DTO.response.ClientResponseDTO;
 public interface ClientServiceInterface {
     ClientResponseDTO create(ClientRequestDTO request);
 
-    ClientResponseDTO findById(Long id);
+    ClientResponseDTO findBySlug(String slug);
 
     List<ClientResponseDTO> findAll();
 
-    ClientResponseDTO replace(Long id, ClientRequestDTO request);
+    ClientResponseDTO replace(String slug, ClientRequestDTO request);
 
-    ClientResponseDTO update(Long id, ClientUpdateDTO request);
+    ClientResponseDTO update(String slug, ClientUpdateDTO request);
 
-    void delete(Long id);
+    void delete(String slug);
 }

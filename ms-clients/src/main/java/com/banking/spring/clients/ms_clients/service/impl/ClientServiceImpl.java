@@ -11,7 +11,6 @@ import com.banking.spring.clients.ms_clients.repository.ClientRepositoryInterfac
 import com.banking.spring.clients.ms_clients.service.ClientServiceInterface;
 import com.banking.spring.clients.ms_clients.service.PasswordServiceInterface;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -31,7 +30,7 @@ public class ClientServiceImpl implements ClientServiceInterface {
     @Override
     @Transactional
     public ClientResponseDTO create(ClientRequestDTO request) {
-        if (clientRepository.existsByIdentification(request.getIdentification())) {
+        if (clientRepository.existsActiveByIdentification(request.getIdentification())) {
             throw new ClientAlreadyExistsException(
                     "El cliente con la identificación %s ya existe".formatted(request.getIdentification()));
         }
@@ -40,15 +39,15 @@ public class ClientServiceImpl implements ClientServiceInterface {
         client.setPassword(passwordService.encode(request.getPassword()));
         Client saved = clientRepository.save(client);
 
-        log.info("El cliente fue creado exitosamente con id: {}", saved.getClientId());
+        log.info("El cliente fue creado exitosamente con slug: {}", saved.getSlug());
 
         return clientMapper.toResponse(saved);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public ClientResponseDTO findById(Long id) {
-        return clientMapper.toResponse(findClientById(id));
+    public ClientResponseDTO findBySlug(String slug) {
+        return clientMapper.toResponse(findClientBySlug(slug));
     }
 
     @Override
@@ -66,11 +65,11 @@ public class ClientServiceImpl implements ClientServiceInterface {
 
     @Override
     @Transactional
-    public ClientResponseDTO replace(Long id, ClientRequestDTO request) {
-        Client client = findClientById(id);
+    public ClientResponseDTO replace(String slug, ClientRequestDTO request) {
+        Client client = findClientBySlug(slug);
 
         if (!client.getIdentification().equals(request.getIdentification()) &&
-                clientRepository.existsByIdentification(request.getIdentification())) {
+                clientRepository.existsActiveByIdentification(request.getIdentification())) {
             throw new ClientAlreadyExistsException(
                     "La identificación %s ya está en uso".formatted(request.getIdentification()));
         }
@@ -83,10 +82,10 @@ public class ClientServiceImpl implements ClientServiceInterface {
 
     @Override
     @Transactional
-    public ClientResponseDTO update(Long id, ClientUpdateDTO request) {
-        log.info("Actualizando cliente con id: {}", id);
+    public ClientResponseDTO update(String slug, ClientUpdateDTO request) {
+        log.info("Actualizando cliente con slug: {}", slug);
 
-        Client client = findClientById(id);
+        Client client = findClientBySlug(slug);
         clientMapper.updateEntityFromDto(request, client);
 
         if (hasNewPassword(request)) {
@@ -98,20 +97,18 @@ public class ClientServiceImpl implements ClientServiceInterface {
 
     @Override
     @Transactional
-    public void delete(Long id) {
-        Client client = findClientById(id);
-        client.setDeletedAt(LocalDateTime.now());
-
-        client.setStatus(false);
+    public void delete(String slug) {
+        Client client = findClientBySlug(slug);
+        client.anonymize();
         clientRepository.save(client);
 
-        log.info("Cliente con id {} desactivado", id);
+        log.info("Cliente con slug {} desactivado", slug);
     }
 
-    private Client findClientById(Long id) {
-        return clientRepository.findActiveById(id)
+    private Client findClientBySlug(String slug) {
+        return clientRepository.findActiveBySlug(slug)
                 .orElseThrow(
-                        () -> new ClientNotFoundException("No se encontro el cliente con el id %d".formatted(id)));
+                        () -> new ClientNotFoundException("No se encontro el cliente con el slug %s".formatted(slug)));
     }
 
     private boolean hasNewPassword(ClientUpdateDTO request) {
