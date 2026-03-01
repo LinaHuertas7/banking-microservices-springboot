@@ -10,6 +10,7 @@ import com.banking.spring.clients.ms_clients.DTO.response.ClientQueryResponseDTO
 import com.banking.spring.clients.ms_clients.mapper.ClientQueryMapperInterface;
 import com.banking.spring.clients.ms_clients.model.Client;
 import com.banking.spring.clients.ms_clients.repository.ClientRepositoryInterface;
+import org.springframework.amqp.rabbit.annotation.Queue;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class ClientQueryListener {
     private final ClientRepositoryInterface clientRepository;
     private final ClientQueryMapperInterface clientQueryMapper;
 
-    @RabbitListener(queues = "client.query.request.queue")
+    @RabbitListener(queuesToDeclare = @Queue(name = "client.query.request.queue", durable = "true"))
     public ClientQueryResponseDTO handleValidationRequest(ClientQueryRequestDTO request) {
         Optional<Client> client = clientRepository.findActiveById(request.getClientId());
 
